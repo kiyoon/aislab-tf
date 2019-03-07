@@ -8,7 +8,7 @@ RUN mv /etc/apt/sources.list /etc/apt/sources.list.old && \
 	mv /sources.list /etc/apt/sources.list
 
 # Pick up some TF dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends --allow-downgrades --allow-change-held-packages \
 # apt-utils install
 		apt-utils \
         build-essential \
@@ -166,6 +166,18 @@ ADD ./cuda9.0-cudnn7.0-nccl2.2-arch6.1/ /tf/
 RUN pip3 --no-cache-dir install /tf/tensorflow-1.7.1-cp35-cp35m-linux_x86_64.whl && \
     pip --no-cache-dir install /tf/tensorflow-1.7.1-cp27-cp27mu-linux_x86_64.whl && \
     rm -rf /tf
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+# apt-utils install
+		vim-gtk \
+		screen \
+		wget \
+		git \
+        && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN pip --no-cache-dir install keras
 
 # RUN ln -s -f /usr/bin/python3 /usr/bin/python#
 
