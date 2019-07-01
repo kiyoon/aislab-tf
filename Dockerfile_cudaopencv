@@ -1,6 +1,6 @@
 FROM nvidia/cuda:9.0-devel-ubuntu16.04
 
-LABEL maintainer="Hyeonsu Lyu <hslyu@unist.ac.kr>"
+LABEL maintainer="Kiyoon Kim <yoonkr33@gmail.com>"
 
 # Change ubuntu repo into daumkakao mirror
 #ADD sources.list /sources.list
@@ -37,6 +37,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends --allow-downgra
 		git \
 		screen \
 		wget \
+		sudo \
+        ssh \
         && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -45,6 +47,7 @@ RUN apt-get update && \
         apt-get install nvinfer-runtime-trt-repo-ubuntu1604-4.0.1-ga-cuda9.0 && \
         apt-get update && \
         apt-get install libnvinfer4=4.1.2-1+cuda9.0
+
 
 # Install cudnn
 ADD ./cuda /cuda
@@ -96,35 +99,47 @@ RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
 	   /usr/local/bin/pip && \
 	cp /usr/local/bin/pip2 /usr/local/bin/pip
 
-# Install python2 ML modules
 RUN pip --no-cache-dir install \
         Pillow \
         h5py \
         ipykernel \
         jupyter \
-        keras_applications \
-        keras_preprocessing \
-        keras==2.1.6 \
         matplotlib \
         numpy \
         pandas \
         scipy \
-        sklearn \
         && \
     python -m ipykernel.kernelspec
 
-# Install python3 ML modules
-RUN pip3 --no-cache-dir install \
-        Pillow \
-        h5py \
-        keras_applications \
-        keras_preprocessing \
-        keras==2.1.6 \
-        matplotlib \
-        numpy \
-        pandas \
-        scipy \
-        sklearn 
+## Install python2 ML modules
+#RUN pip --no-cache-dir install \
+#        Pillow \
+#        h5py \
+#        ipykernel \
+#        jupyter \
+#        keras_applications \
+#        keras_preprocessing \
+#        keras==2.1.6 \
+#        matplotlib \
+#        numpy \
+#        pandas \
+#        scipy \
+#        sklearn \
+#        && \
+#    python -m ipykernel.kernelspec
+#
+## Install python3 ML modules
+#RUN pip3 --no-cache-dir install \
+#        Pillow \
+#        h5py \
+#        keras_applications \
+#        keras_preprocessing \
+#        keras==2.1.6 \
+#        matplotlib \
+#        numpy \
+#        pandas \
+#        scipy \
+#        sklearn 
 
 # Install Opencv3.4 by compiling
 ADD ./opencv /opencv
@@ -157,7 +172,7 @@ RUN	mkdir /opencv/build && \
 		-D WITH_CUDA=ON \
 		-D CUDA_FAST_MATH=ON \
 		-D WITH_CUBLAS=ON \
-		-D CUDA_ARCH_BIN=6.1 7.5 \
+		-D CUDA_ARCH_BIN=6.1 \
 		-D CUDA_TOOLKIT_ROOT_DIR:PATH=/usr/local/cuda-9.0 \
 		.. && \
 	export NUMPROC=$(nproc --all) && \
@@ -167,33 +182,49 @@ RUN	mkdir /opencv/build && \
 # Remove mounted directory
 	rm /opencv -r 
 
-# Install TensorFlow GPU version.
-ADD ./cuda9.0-cudnn7.0-nccl2.2-arch6.1/ /tf/
-RUN pip3 --no-cache-dir install /tf/tensorflow-1.7.1-cp35-cp35m-linux_x86_64.whl && \
-    pip --no-cache-dir install /tf/tensorflow-1.7.1-cp27-cp27mu-linux_x86_64.whl && \
-    rm -rf /tf
 
-# RUN ln -s -f /usr/bin/python3 /usr/bin/python#
+# Add user
+RUN adduser --disabled-password --gecos '' docker && adduser docker sudo
+RUN adduser --disabled-password --gecos '' docker1 && adduser docker1 sudo
+RUN adduser --disabled-password --gecos '' docker2 && adduser docker2 sudo
+RUN adduser --disabled-password --gecos '' docker3 && adduser docker3 sudo
+RUN adduser --disabled-password --gecos '' docker4 && adduser docker4 sudo
+RUN adduser --disabled-password --gecos '' docker5 && adduser docker5 sudo
+RUN adduser --disabled-password --gecos '' docker6 && adduser docker6 sudo
+RUN adduser --disabled-password --gecos '' docker7 && adduser docker7 sudo
+RUN adduser --disabled-password --gecos '' docker8 && adduser docker8 sudo
+RUN adduser --disabled-password --gecos '' docker9 && adduser docker9 sudo
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-# Set up our notebook config.
-COPY jupyter_notebook_config.py /root/.jupyter/
 
-# Copy sample notebooks.
-COPY notebooks /notebooks
 
-# Jupyter has issues with being run directly:
-#   https://github.com/ipython/ipython/issues/7062
-# We just add a little wrapper script.
-COPY run_jupyter.sh /
-
-# For CUDA profiling, TensorFlow requires CUPTI.
-ENV LD_LIBRARY_PATH /usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
-ENV PATH /usr/local/cuda/bin:$PATH
-
-# TensorBoard
-EXPOSE 6006
-# IPython
-EXPOSE 8888
+## Install TensorFlow GPU version.
+#ADD ./cuda9.0-cudnn7.0-nccl2.2-arch6.1/ /tf/
+#RUN pip3 --no-cache-dir install /tf/tensorflow-1.7.1-cp35-cp35m-linux_x86_64.whl && \
+#    pip --no-cache-dir install /tf/tensorflow-1.7.1-cp27-cp27mu-linux_x86_64.whl && \
+#    rm -rf /tf
+#
+## RUN ln -s -f /usr/bin/python3 /usr/bin/python#
+#
+## Set up our notebook config.
+#COPY jupyter_notebook_config.py /root/.jupyter/
+#
+## Copy sample notebooks.
+#COPY notebooks /notebooks
+#
+## Jupyter has issues with being run directly:
+##   https://github.com/ipython/ipython/issues/7062
+## We just add a little wrapper script.
+#COPY run_jupyter.sh /
+#
+## For CUDA profiling, TensorFlow requires CUPTI.
+#ENV LD_LIBRARY_PATH /usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
+#ENV PATH /usr/local/cuda/bin:$PATH
+#
+## TensorBoard
+#EXPOSE 6006
+## IPython
+#EXPOSE 8888
 
 #WORKDIR "/notebooks"
 
