@@ -37,6 +37,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends --allow-downgra
 		git \
 		screen \
 		wget \
+        ssh \
         && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*

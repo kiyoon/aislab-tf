@@ -184,16 +184,7 @@ RUN	mkdir /opencv/build && \
 
 
 # Add user
-RUN adduser --disabled-password --gecos '' docker && adduser docker sudo
-RUN adduser --disabled-password --gecos '' docker1 && adduser docker1 sudo
-RUN adduser --disabled-password --gecos '' docker2 && adduser docker2 sudo
-RUN adduser --disabled-password --gecos '' docker3 && adduser docker3 sudo
-RUN adduser --disabled-password --gecos '' docker4 && adduser docker4 sudo
-RUN adduser --disabled-password --gecos '' docker5 && adduser docker5 sudo
-RUN adduser --disabled-password --gecos '' docker6 && adduser docker6 sudo
-RUN adduser --disabled-password --gecos '' docker7 && adduser docker7 sudo
-RUN adduser --disabled-password --gecos '' docker8 && adduser docker8 sudo
-RUN adduser --disabled-password --gecos '' docker9 && adduser docker9 sudo
+RUN for i in {0..9}; do adduser --disabled-password --gecos '' docker$i && adduser docker$i sudo; done
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 
