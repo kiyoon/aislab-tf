@@ -173,6 +173,18 @@ RUN pip3 --no-cache-dir install /tf/tensorflow-1.7.1-cp35-cp35m-linux_x86_64.whl
     pip --no-cache-dir install /tf/tensorflow-1.7.1-cp27-cp27mu-linux_x86_64.whl && \
     rm -rf /tf
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+# apt-utils install
+		vim-gtk \
+		screen \
+		wget \
+		git \
+        && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN pip --no-cache-dir install keras
+
 # RUN ln -s -f /usr/bin/python3 /usr/bin/python#
 
 # Set up our notebook config.
